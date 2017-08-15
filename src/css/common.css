@@ -1,3 +1,11 @@
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #03A8F3;
+  height: 0.6rem;
+}
 .container {
   position: absolute;
   top: 0.6rem;

@@ -12,6 +12,11 @@ export default new Router({
       component: resolve => require(['../pages/home/'], resolve)
     },
     {
+      path: '/detail/:id', // 详情
+      name: 'detail',
+      component: resolve => require(['../pages/detail/'], resolve)
+    },
+    {
       path: '/msg', // msg
       name: 'msg',
       component: resolve => require(['../pages/msg/'], resolve)
