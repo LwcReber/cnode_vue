@@ -6,10 +6,14 @@ import router from './router'
 import './css/common.css'
 
 import components from './components'
-
+// 滑动加载插件
+import infiniteScroll from 'vue-infinite-scroll'
 import VueResource from 'vue-resource'
+// loading插件
+Vue.component('scale-loader', require('vue-spinner/src/ScaleLoader.vue'))
 
 Vue.use(VueResource)
+Vue.use(infiniteScroll)
 Vue.config.productionTip = false;
 
 (

@@ -35,6 +35,7 @@ export default {
   bottom: 0;
   background-color: #03A8F3;
   height: 0.6rem;
+  z-index: 10;
   span {
     width: 25%;
     height: 0.6rem;

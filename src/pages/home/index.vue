@@ -5,7 +5,7 @@
         {{item.name}}
       </span>
     </div>
-    <div class="container">
+    <div class="container" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="0">
       <div class="topic-item" v-for="topic in topicList">
         <router-link class="link" :to="{name: 'detail', params: {id: topic.id}}"></router-link>
         <div class="topicImg">
@@ -19,6 +19,8 @@
         </div>
       </div>
     </div>
+    <scale-loader class="loading-bar" :loading="loading" :color="color"></scale-loader>
+    <!-- <a class="top" href="javascript:scroll(0,0)" ng-show='toTop'>顶部</a> -->
     <v-footer></v-footer>
   </div>
 </template>
@@ -34,8 +36,12 @@ export default {
         { tab: 'ask', name: '问答', isActive: false },
         { tab: 'job', name: '招聘', isActive: false }
       ],
+      currentTab: '',
       page: 1,
-      topicList: this.getDatas('')
+      topicList: [],
+      busy: false, // false 触发滑动加载，true禁止滑动加载 初始为false自调一次获取主页的内容
+      loading: true,
+      color: '#2195F2'
     }
   },
   methods: {
@@ -46,24 +52,45 @@ export default {
           this.headerTab[i].isActive = false
         }
       }
+      this.currentTab = tab.tab
+      // 切换tab清空content的内容
+      this.topicList.length = 0
+      // 页数请求置0
+      this.page = 0
       tab.isActive = true
       this.getDatas(tab.tab)
     },
     getDatas (tab) {
       var vm = this
+      // 运行滚动加载
       vm.$http.get('https://cnodejs.org/api/v1/topics?page=' + vm.page + '&tab=' + tab + '&limit=20', {'timeout': 3000})
       .then(
       // 响应成功
       (respone) => {
-        vm.topicList = respone.data.data
+        vm.topicList = vm.topicList.concat(respone.data.data)
+        // 开启滚动加载
+        vm.busy = false
+        vm.page++
+        // 关闭loading-bar
+        vm.loading = false
       },
       // 响应失败
       (result) => {
+        // 开启滚动加载
+        vm.busy = false
         console.log(result)
       }
       )
+    },
+    loadMore () {
+      // 禁止滑动加载
+      this.busy = true
+      // 打开loading-bar
+      this.loading = true
+      setTimeout(() => {
+        this.getDatas(this.currentTab)
+      }, 100)
     }
-
   }
 }
 </script>
@@ -84,6 +111,7 @@ export default {
 .container {
   background-color: #ECEFF1;
   padding: 0 0.08rem 0 0.08rem;
+  height: 90%; // 设置高度才能触发loadMore函数
   .topic-item {
     position: relative;
     margin-top: .1rem;
@@ -108,11 +136,11 @@ export default {
       height: .8rem;
       line-height: .8rem;
       margin-right: .1rem;
+      margin-left: .1rem;
       img {
         width: .5rem;
         height: .5rem;
         margin-top: .15rem;
-        padding-left: 0.15rem;
         border-radius: 50%;
       }
     }
@@ -121,7 +149,7 @@ export default {
       display: table;
       clear: both;
     }
-}
+  }
 
   .topicCont {
     height: .8rem;
@@ -156,5 +184,32 @@ export default {
     }
   }
 }
+// loading-bar的居中
+.v-spinner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.6rem;
+  // z-index: 100;
+  margin-top: 0.6rem;
+  .v-bounce {
+    margin: auto;
+  }
+}
 
+//返回顶部
+.top {
+  position: fixed;
+  right: 0;
+  bottom: .8rem;
+  width: .3rem;
+  text-align: center;
+  background-color: blue;
+  border-radius: .05rem;
+  color: white;
+  font-size: .16rem;
+}
+.top:hover {
+  text-decoration: none;
+}
 </style>
