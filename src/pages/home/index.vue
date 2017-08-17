@@ -5,7 +5,7 @@
         {{item.name}}
       </span>
     </div>
-    <div class="container" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="0">
+    <div class="container">
       <div class="topic-item" v-for="topic in topicList">
         <router-link class="link" :to="{name: 'detail', params: {id: topic.id}}"></router-link>
         <div class="topicImg">
@@ -13,14 +13,15 @@
         </div>
         <div class="topicCont">
           <div class="topichead">
-            <span>{{topic.author.loginname}}</span>
+            <span class="tabtype" v-show="tabtypeShow" v-bind:class="{true:'active' ,false:''}">{{topic.top?'置顶' : topic.good? '精华' : topic.tab=='ask' ? '问答' :'分享'}}</span>
+            <span class="topicAtr">{{topic.author.loginname}}</span>
           </div>
           <h4>{{topic.title}}</h4>
         </div>
       </div>
+      <sync-loader class="loading-bar" :loading="loading" :color="color"></sync-loader>
     </div>
-    <scale-loader class="loading-bar" :loading="loading" :color="color"></scale-loader>
-    <!-- <a class="top" href="javascript:scroll(0,0)" ng-show='toTop'>顶部</a> -->
+    <v-goTop></v-goTop>
     <v-footer></v-footer>
   </div>
 </template>
@@ -39,10 +40,16 @@ export default {
       currentTab: '',
       page: 1,
       topicList: [],
-      busy: false, // false 触发滑动加载，true禁止滑动加载 初始为false自调一次获取主页的内容
+      busy: true, // true 触发滑动加载，false禁止滑动加载
       loading: true,
-      color: '#2195F2'
+      color: '#2195F2',
+      tabtypeShow: true
     }
+  },
+  mounted () {
+    // 初始化获取home的内容
+    this.getDatas('')
+    window.addEventListener('scroll', this.loadMore, false)
   },
   methods: {
     changeTab (tab) {
@@ -62,6 +69,12 @@ export default {
     },
     getDatas (tab) {
       var vm = this
+      // 在全部和精华中显示 tabtype
+      if (tab === '' || tab === 'good') {
+        vm.tabtypeShow = true
+      } else {
+        vm.tabtypeShow = false
+      }
       // 运行滚动加载
       vm.$http.get('https://cnodejs.org/api/v1/topics?page=' + vm.page + '&tab=' + tab + '&limit=20', {'timeout': 3000})
       .then(
@@ -69,7 +82,7 @@ export default {
       (respone) => {
         vm.topicList = vm.topicList.concat(respone.data.data)
         // 开启滚动加载
-        vm.busy = false
+        vm.busy = true
         vm.page++
         // 关闭loading-bar
         vm.loading = false
@@ -77,20 +90,31 @@ export default {
       // 响应失败
       (result) => {
         // 开启滚动加载
-        vm.busy = false
+        vm.busy = true
         console.log(result)
       }
       )
     },
     loadMore () {
-      // 禁止滑动加载
-      this.busy = true
-      // 打开loading-bar
-      this.loading = true
-      setTimeout(() => {
-        this.getDatas(this.currentTab)
-      }, 100)
+      if (this.busy) {
+        // document.body.scrollHeight: container正文全文高：
+        // document.body.scrollTop: 滚动条滚动距离
+        // window.innerHeight: 浏览器窗口高度
+        let totalHeight = document.body.scrollTop + window.innerHeight
+        if (totalHeight >= document.body.scrollHeight) {
+          // 禁止滑动加载
+          this.busy = false
+          // 打开loading-bar
+          this.loading = true
+          setTimeout(() => {
+            this.getDatas(this.currentTab)
+          }, 300)
+        }
+      }
     }
+  },
+  destroy () {
+    window.removeEventListener('scroll', this.loadMore, false)
   }
 }
 </script>
@@ -110,8 +134,7 @@ export default {
 }
 .container {
   background-color: #ECEFF1;
-  padding: 0 0.08rem 0 0.08rem;
-  height: 90%; // 设置高度才能触发loadMore函数
+  padding: .1rem 0.08rem 1.2rem 0.08rem;
   .topic-item {
     position: relative;
     margin-top: .1rem;
@@ -161,15 +184,16 @@ export default {
         float: left;
         width: .4rem;
         height: .2rem;
-        background-color:#B7B4B4;
+        line-height: .2rem;
+        background-color: #4BAE4F;
         color: white;
         text-align: center;
         border-radius: .05rem;
-        &.active{
+        &.active {
           background-color: green;
         }
       }
-      span {
+      .topicAtr {
         float: right;
         padding-right: 0.15rem;
       }
@@ -189,27 +213,7 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0.6rem;
-  // z-index: 100;
-  margin-top: 0.6rem;
-  .v-bounce {
-    margin: auto;
-  }
-}
-
-//返回顶部
-.top {
-  position: fixed;
-  right: 0;
-  bottom: .8rem;
-  width: .3rem;
+  bottom: 0.75rem;
   text-align: center;
-  background-color: blue;
-  border-radius: .05rem;
-  color: white;
-  font-size: .16rem;
-}
-.top:hover {
-  text-decoration: none;
 }
 </style>

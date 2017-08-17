@@ -29,11 +29,12 @@ export default {
 
 <style lang="scss">
 .nav {
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: #03A8F3;
+  width: 100%;
   height: 0.6rem;
   z-index: 10;
   span {
