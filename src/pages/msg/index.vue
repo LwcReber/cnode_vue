@@ -3,10 +3,11 @@
     <div class="header">
       <a href="#home">主页</a>
     </div>
-    <div class="container">
-      这是msg
+    <div class="v-content">
+      <div class="no-msg">
+        暂无消息
+      </div>
     </div>
-
     <v-footer></v-footer>
   </div>
 
@@ -23,6 +24,13 @@ export default {
 }
 </script>
 
-<style lang="css">
-
+<style lang="scss">
+  .no-msg {
+    position: absolute;
+    width: auto;/* 宽度根据内容自适应 */
+    height:auto;/* 高度根据内容自适应 */
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+  }
 </style>

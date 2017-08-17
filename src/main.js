@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import './css/common.css'
+import './css/common.scss'
 
 import components from './components'
 import VueResource from 'vue-resource'
