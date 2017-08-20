@@ -1,3 +1,8 @@
+// 重新计算rem
+@function pxRem($px) {
+  @return $px / 100 * 1rem;
+}
+
 .header {
   position: fixed;
   top: 0;
@@ -5,30 +10,30 @@
   right: 0;
   background-color: #03A8F3;
   width: 100%;
-  height: 0.6rem;
+  height: pxRem(60);
   z-index: 11;
 }
 .container {
   position: relative;
-  top: 0.6rem;
+  top: pxRem(60);
   /*overflow-y: scroll;*/
 }
 .v-content {
   position: absolute;
-  top: 0.6rem;
+  top: pxRem(60);
   left: 0;
   right: 0;
-  bottom: 0.6rem;
+  bottom: pxRem(60);
   background-color: #ECEFF1;
 }
 /*话题*/
 .topic-item {
   position: relative;
-  margin-bottom: .1rem;
+  margin-bottom: pxRem(10);
   background-color: #fff;
-  height: .8rem;
+  height: pxRem(80);
   cursor: pointer;
-  border-radius: 0.05rem;
+  border-radius: pxRem(5);
 
   .link {
     position: absolute;
@@ -43,14 +48,14 @@
 
   .topicImg {
     float: left;
-    height: .8rem;
-    line-height: .8rem;
-    margin-right: .1rem;
-    margin-left: .1rem;
+    height: pxRem(80);
+    line-height: pxRem(80);
+    margin-right: pxRem(10);
+    margin-left: pxRem(10);
     img {
-      width: .5rem;
-      height: .5rem;
-      margin-top: .15rem;
+      width: pxRem(50);
+      height: pxRem(50);
+      margin-top: pxRem(15);
       border-radius: 50%;
     }
   }
@@ -61,54 +66,54 @@
   }
 }
 .topicCont {
-  height: .8rem;
-  padding-top: .05rem;
-  padding-bottom: .05rem;
+  height: pxRem(80);
+  padding-top: pxRem(5);
+  padding-bottom: pxRem(5);
   .topichead {
-    height: .2rem;
+    height: pxRem(20);
     .tabtype {
       float: left;
-      width: .4rem;
-      height: .2rem;
-      line-height: .2rem;
+      width: pxRem(40);
+      height: pxRem(20);
+      line-height: pxRem(20);
       background-color: #4BAE4F;
       color: white;
       text-align: center;
-      border-radius: .05rem;
+      border-radius: pxRem(5);
       &.active {
         background-color: green;
       }
     }
     .topicAtr {
       float: right;
-      padding-right: 0.15rem;
+      padding-right: pxRem(15);
     }
   }
   h4 {
     //限制内容
-    width: 3rem;
-    margin-top: .05rem;
+    width: pxRem(300);
+    margin-top: pxRem(5);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 }
 /*收藏按钮，登录按钮*/
-.collect , .uncoll , .register {
-    height: .3rem;
-    margin-top: .15rem;
-    margin-right: .1rem;
+.collect , .uncoll , .signOut {
+    height: pxRem(30);
+    margin-top: pxRem(15);
+    margin-right: pxRem(10);
     float: right;
     cursor: pointer;
     text-align: center;
-    line-height: .3rem;
-    border-radius: 0.08rem;
+    line-height: pxRem(30);
+    border-radius: pxRem(8);
   }
-  .collect , .register{
-    width:.6rem;
+  .collect , .signOut{
+    width: pxRem(60);
     background-color:#50D719;
   }
   .uncoll{
-    width: 1rem;
+    width: pxRem(100);
     background-color: #07474E;
   }

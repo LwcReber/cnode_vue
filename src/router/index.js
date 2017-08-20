@@ -5,6 +5,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/home', // 主页
@@ -12,7 +13,7 @@ export default new Router({
       component: resolve => require(['../pages/home/'], resolve)
     },
     {
-      path: '/detail/:id', // 详情
+      path: '/detail', // 详情
       name: 'detail',
       component: resolve => require(['../pages/detail/'], resolve)
     },

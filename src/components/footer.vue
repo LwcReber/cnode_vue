@@ -1,6 +1,6 @@
 <template lang="html">
-  <div class="nav">
-    <span  v-bind:class="{ activeNav: item.path == $route.path}" v-on:click="goto(item)" v-for="item in footerTab">
+  <div class="nav" v-if="$route.path.indexOf('detail') === -1">
+    <span  v-bind:class="{ activeNav: item.path == $route.path}" @click="goto(item)" v-for="item in footerTab">
       {{item.tab}}
     </span>
   </div>
@@ -20,7 +20,8 @@ export default {
   },
   methods: {
     goto: function (tab) {
-      this.$router.replace({ path: tab.path })
+      // 命名的路由
+      this.$router.push({ path: tab.path })
     }
   }
 

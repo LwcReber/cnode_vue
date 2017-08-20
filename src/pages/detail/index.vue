@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="">
     <div class="header">
-      <a href="#home">主页</a>
+      <v-goback></v-goback>
     </div>
     <div class="content" v-html="topicCtn">
       <div>{{topicCtn}}</div>
@@ -13,17 +13,22 @@
 export default {
   data () {
     return {
-      topicCtn: this.getDetail(this.$route.params.id)
+      topicCtn: this.getDetail(this.$route.query.id)
     }
+  },
+  mounted () {
+    localStorage.setItem('id', this.$route.query.id)
+  },
+  destroy () {
+    localStorage.removeItem('id')
   },
   methods: {
     getDetail (id) {
-      var vm = this
       this.$http.get('https://cnodejs.org/api/v1/topic/' + id + '?mdrender=true')
       .then(
         // 响应成功
         (respone) => {
-          vm.topicCtn = respone.data.data.content
+          this.topicCtn = respone.data.data.content
         },
         // 响应失败
         (result) => {
@@ -36,12 +41,14 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../../css/pxRem.scss";
+
 .content {
   position: absolute;
-  top: .6rem;
-  left: .1rem;
-  right: .1rem;
-  bottom: 0;
+  top: pxRem(60);
+  left: pxRem(10);
+  right: pxRem(10);
+  // bottom: 0;
   overflow-y: scroll;
   background-color: #ECEFF1;
   img {

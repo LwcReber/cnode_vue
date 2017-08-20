@@ -7,7 +7,7 @@
     </div>
     <div class="container">
       <div class="topic-item" v-for="topic in topicList">
-        <router-link class="link" :to="{name: 'detail', params: {id: topic.id}}"></router-link>
+        <router-link class="link" :to="{path: 'detail', query: {id: topic.id}}"></router-link>
         <div class="topicImg">
           <img :src="topic.author.avatar_url" alt="" >
         </div>
@@ -21,8 +21,8 @@
       </div>
       <sync-loader class="loading-bar" :loading="loading" :color="color"></sync-loader>
     </div>
-    <v-goTop></v-goTop>
-    <v-footer></v-footer>
+    <v-go-top></v-go-top>
+
   </div>
 </template>
 
@@ -39,7 +39,7 @@ export default {
       ],
       currentTab: '',
       page: 1,
-      topicList: [],
+      topicList: '',
       busy: true, // true 触发滑动加载，false禁止滑动加载
       loading: true,
       color: '#2195F2',
@@ -68,29 +68,28 @@ export default {
       this.getDatas(tab.tab)
     },
     getDatas (tab) {
-      var vm = this
       // 在全部和精华中显示 tabtype
       if (tab === '' || tab === 'good') {
-        vm.tabtypeShow = true
+        this.tabtypeShow = true
       } else {
-        vm.tabtypeShow = false
+        this.tabtypeShow = false
       }
       // 运行滚动加载
-      vm.$http.get('https://cnodejs.org/api/v1/topics?page=' + vm.page + '&tab=' + tab + '&limit=20', {'timeout': 3000})
+      this.$http.get('https://cnodejs.org/api/v1/topics?page=' + this.page + '&tab=' + tab + '&limit=20', {'timeout': 3000})
       .then(
       // 响应成功
-      (respone) => {
-        vm.topicList = vm.topicList.concat(respone.data.data)
+      ({data}) => {
+        this.topicList = [...this.topicList, ...data.data]
         // 开启滚动加载
-        vm.busy = true
-        vm.page++
+        this.busy = true
+        this.page++
         // 关闭loading-bar
-        vm.loading = false
+        this.loading = false
       },
       // 响应失败
       (result) => {
         // 开启滚动加载
-        vm.busy = true
+        this.busy = true
         console.log(result)
       }
       )
@@ -120,10 +119,12 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../../css/pxRem.scss";
+
 .nav-item {
   width: 20%;
-  height: 0.6rem;
-  line-height: 0.6rem;
+  height: pxRem(60);
+  line-height: pxRem(60);
   color: #fff;
   cursor: pointer;
   text-align:center;
@@ -134,14 +135,14 @@ export default {
 }
 .container {
   background-color: #ECEFF1;
-  padding: 0.1rem 0.08rem 1.2rem 0.08rem;
+  padding: pxRem(10) pxRem(8) pxRem(120) pxRem(8);
 }
 // loading-bar的居中
 .v-spinner {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0.75rem;
+  bottom: pxRem(75);
   text-align: center;
 }
 </style>

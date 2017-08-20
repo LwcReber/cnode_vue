@@ -1,45 +1,43 @@
 <template lang="html">
   <div class="">
     <div class="header">
-      <a href="#home">返回</a>
-      <span class="register">退出</span>
+      <v-goback></v-goback>
+      <span class="signOut" v-if="login" @click="signOut">退出</span>
     </div>
     <div class="v-content">
-      <div class="accCenter">
-        <div v-show="userInfo==false" class="access">
-          <div class="reg-title">
-            请输入您的accesstoken
-          </div>
-          <input type="text"  class="reg-Ipt " v-model="accesstoken" placeholder="accesstoken">
-          <div class="reg-button" @click="register">登录</div>
-          <div class="alert-danger acc-warn" v-show='accWarn'>
-            请输入accesstoken!!!
-          </div>
+      <div v-show="!login" class="login">
+        <div class="reg-title">
+          请输入您的accesstoken
+        </div>
+        <input type="text"  class="reg-Ipt " v-model="accesstoken" placeholder="accesstoken">
+        <div class="reg-button" @click="register">登录</div>
+        <div class="alert-danger acc-warn" v-show='accWarn'>
+          请输入accesstoken!!!
         </div>
       </div>
 
-      <div class="" v-show="userInfo==true">
+      <div class="userInfo" v-show="login">
         <div class="avatar">
-          <img :src="user.imgUrl"  alt="">
-          <span>用户名 : {{user.loginname}}</span>
+          <img :src="user.imgUrl"  alt="用户头像">
+          <span>{{user.loginName}}</span>
         </div>
         <div class="topiccal">收藏话题{{user.Topiccal}}个</div>
         <div class="topic-item"
           v-for="collTopic in collTopicList">
+          <router-link class="link" :to="{path: 'detail', query: {id: collTopic.id}}"></router-link>
           <div class="topicImg">
             <img :src="collTopic.author.avatar_url" alt="" >
           </div>
           <div class="topicCont">
             <div class="topichead">
               <span class="tabtype" v-bind:class="{true:'active' ,false:''}">{{collTopic.top?'置顶' : collTopic.good? '精华' : collTopic.tabtype=='ask' ? '问答' :'分享'}}</span>
-              <span>{{collTopic.author.loginname}}</span>
+              <span class="topicAtr">{{collTopic.author.loginname}}</span>
             </div>
             <h4>{{collTopic.title}}</h4>
           </div>
         </div>
       </div>
     </div>
-    <v-footer></v-footer>
   </div>
 </template>
 
@@ -47,120 +45,158 @@
 export default {
   data () {
     return {
-      userInfo: false, // 是否有用户信息
-      accesstoken: '', // 用户的登录码
+      login: false, // 是否登录
+      accesstoken: localStorage.accesstoken || '', // 用户的登录码
       accWarn: false, // 没有登录警告显示
       collTopicList: [], // 用户收集的主题文章
       user: {
-        loginname: '', // 用户名
-        imgUrl: '', // 用户头像url
-        userTopiccal: 0 // 收集主题数
+        loginName: localStorage.loginName || '', // 用户名
+        imgUrl: localStorage.imgUrl || '', // 用户头像url
+        Topiccal: '0' // 收集主题数总数
       }
+    }
+  },
+  mounted () {
+    console.log(this.user.loginName)
+    if (localStorage.accesstoken) {
+      console.log('用户加载')
+      this.getCollected()
+    }
+    if (this.accesstoken !== '') {
+      this.login = true
     }
   },
   methods: {
     register () {
-      var vm = this
-      if (this.userInfo === false) {
+      if (this.login === false) {
         // 如果没有输入accesstoken
         if (this.accesstoken === undefined || this.accesstoken === '') {
           this.accWarn = true
           return
         }
         this.accWarn = false
-
         // post请求登录
         this.$http.post('https://cnodejs.org/api/v1/accesstoken',
           {
-            accesstoken: vm.accesstoken
+            accesstoken: this.accesstoken
           })
         // 成功响应
-        .then((respone) => {
+        .then(function (respone) {
           alert('登录成功')
           // 清空原有的收藏主题
-          vm.collTopicList.length = 0
-          vm.userInfo = true
-          vm.user.loginname = respone.data.loginname
-          vm.user.imgUrl = respone.data.avatar_url
-          vm.getCollected()
+          this.collTopicList.length = 0
+          // 清除上次的localStorage缓存
+          localStorage.clear()
+          this.login = true
+          this.user.loginName = respone.data.loginname
+          this.user.imgUrl = respone.data.avatar_url
+
+          // 保存到loca1Storge
+          localStorage.accesstoken = this.accesstoken
+          localStorage.loginName = this.user.loginName
+          localStorage.imgUrl = this.user.imgUrl
+          this.getCollected()
         },
         // 响应失败
-        (result) => {
-          console.log(result)
-        }
+        (result) => console.log(result)
         )
       }
     },
     getCollected () {
-      var vm = this
-      this.$http.get('https://cnodejs.org/api/v1/topic_collect/' + vm.user.loginname)
+      this.$http.get('https://cnodejs.org/api/v1/topic_collect/' + this.user.loginName)
       .then((result) => {
-        vm.userTopiccal = result.data.data.length
-        vm.collTopicList = vm.collTopicList.concat(result.data.data)
+        this.user.Topiccal = result.data.data.length
+        console.log(result.data.data.length)
+        this.collTopicList = result.data.data
+        localStorage.collTopicList = JSON.stringify(this.collTopicList)
       },
       (err) => {
         console.log(err)
       }
       )
+    },
+    signOut () {
+      this.login = false
+      this.accesstoken = ''
+      localStorage.clear()
+      setTimeout(() => {
+        alert('成功退出')
+        // 清除上次的localStorage缓存
+      }, 200)
     }
   }
 }
 </script>
 
 <style lang="scss">
-  //登录居中显示
-  .accCenter {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    right: 50%;
-    bottom: 50%;
-    /* 用户登录验证*/
-    .access {
-      width: 3rem;
-      height: 1.2rem;
-      margin-left: -1.5rem;
-      margin-top: -.6rem;
-      font-size: .2rem;
-      padding: .08rem;
+@import "../../css/pxRem.scss";
 
-      .reg-title {
-        text-align: center;
-      }
-      .reg-Ipt {
-        width: 100%;
-        height: .5rem;
-        font-size: 0.16rem;
-        margin-top: .05rem;
-        border: 1px solid #DCDCDC;
-        border-radius: 0.05rem;
-      }
-      .reg-button {
-        width: 100%;
-        height: .3rem;
-        margin-top: .08rem;
-        border-radius: .05rem;
-        text-align: center;
-        background-color: #747474;
-      }
-      .acc-warn {
-        height: .3rem;
-      }
+  //登录居中显示
+  // /* 用户登录验证*/
+  .login {
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    width: pxRem(300);
+    height: pxRem(120);
+    font-size: pxRem(20);
+    padding: pxRem(8);
+
+    .reg-title {
+      text-align: center;
+    }
+    .reg-Ipt {
+      width: 100%;
+      height: pxRem(50);
+      font-size: pxRem(20);
+      margin-top: pxRem(5);
+      border: pxRem(1) solid #DCDCDC;
+      border-radius: pxRem(5);
+    }
+    .reg-button {
+      width: 100%;
+      height: pxRem(30);
+      line-height: pxRem(30);
+      margin-top: pxRem(8);
+      border-radius: pxRem(5);
+      text-align: center;
+      background-color: #747474;
+    }
+    .acc-warn {
+      height: pxRem(30);
     }
   }
-  /*用户头像*/
-  .avatar {
-    margin-top: .05rem;
-    img {
-      //float: left;
-      width: .5rem;
-      height: .5rem;
-      border-radius: .05rem;
+
+  // 用户信息
+  .userInfo{
+    padding: 0 pxRem(8) 0 pxRem(8);
+    /*用户头像*/
+    .avatar {
+      margin-top: pxRem(5);
+      line-height: pxRem(50);
+      img {
+        float: left;
+        width: pxRem(50);
+        height: pxRem(50);
+        border-radius: 50%;
+        border: pxRem(1) solid #BCBCBC;
+      }
+      span {
+        margin-left: pxRem(10);
+      }
+    }
+    .avatar:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    //收藏的话题
+    .topiccal {
+      margin-top: pxRem(32);
+      margin-bottom: pxRem(10);
     }
   }
-  //收藏的话题
-  .topiccal {
-    margin-top: .32rem;
-  }
+
 
 </style>

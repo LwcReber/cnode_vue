@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="">
     <div class="header">
-      <a href="#home">返回</a>
+      <v-goback></v-goback>
     </div>
     <div class="v-content">
       <div class="publish">
@@ -29,7 +29,6 @@
         <span>提交</span>
       </div>
     </div>
-    <v-footer></v-footer>
   </div>
 </template>
 
@@ -44,7 +43,6 @@ export default {
   },
   methods: {
     submit () {
-      var vm = this
       // 内容为空不发送请求
       if (this.getIpt === '' || this.getPubType === 'none' || this.getMarkdown === '') {
         alert('内容为空')
@@ -53,9 +51,9 @@ export default {
       this.$http.post('https://cnodejs.org/api/v1/topics',
         {
           accesstoken: '32794b15-c1e8-4d80-8170-fdfb52d65a70',
-          title: vm.getIpt,
-          tab: vm.getPubType,
-          content: vm.getMarkdown
+          title: this.getIpt,
+          tab: this.getPubType,
+          content: this.getMarkdown
         })
       .then((respone) => {
         if (respone.success === true) {
@@ -74,52 +72,53 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../../css/pxRem.scss";
+
   .v-content {
-    padding: 0 .1rem 0 .1rem;
+    padding: 0 pxRem(10) 0 pxRem(10);
+    font-size: pxRem(16);
   }
   .publish {
-    margin-top: .1rem;
-    font-size: 16px;
+    margin-top: pxRem(10);
     .publishSel {
-      width:1.5rem;
-      margin-left: .1rem;
-      border-radius: 0.03rem;
+      width: pxRem(150);
+      height: pxRem(30);
+      margin-left: pxRem(10);
+      border-radius: pxRem(2);
     }
 
     .ask , .job {
-      margin-top: 0.05rem;
-      text-indent:2em;
+      margin-top: pxRem(5);
+      text-indent: 2em;
     }
   }
   .title {
-    margin-top: .2rem;
-    margin-bottom: .2rem;
+    margin-top: pxRem(20);
+    margin-bottom: pxRem(20);
     width: 100%;
-    height: .4rem;
-    border: 1px solid #DCDCDC;
-    border-radius: 0.05rem;
+    height: pxRem(40);
+    border: pxRem(1) solid #DCDCDC;
+    border-radius: pxRem(5);
     outline: none;
-    font-size: 16px;
   }
   // 提交按钮
   .commit {
     float: left;
-    width: .5rem;
-    height: .3rem;
-    margin-top: .1rem;
+    width: pxRem(50);
+    height: pxRem(30);
+    margin-top: pxRem(10);
     background-color: rgb(37, 135, 215);
     color: white;
     text-align: center;
-    line-height: .3rem;
-    border-radius: 0.05rem;
-    font-size: 16px;
+    line-height: pxRem(30);
+    border-radius: pxRem(5);
   }
 
   /*主题编辑框*/
   .markdown {
     width: 100%;
-    height: 2rem;
+    height: pxRem(200);
     padding: 0;
-    border-radius: .05rem;
+    border-radius: pxRem(5);
   }
 </style>
