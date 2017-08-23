@@ -31,7 +31,7 @@
           <div class="topicCont">
             <div class="topichead">
               <span class="tabtype" v-bind:class="{true:'active' ,false:''}">{{collTopic.top?'置顶' : collTopic.good? '精华' : collTopic.tabtype=='ask' ? '问答' :'分享'}}</span>
-              <span class="topicAtr">{{collTopic.author.loginname}}</span>
+              <span class="topicAtr">发表人： {{collTopic.author.loginname}}</span>
             </div>
             <h4>{{collTopic.title}}</h4>
           </div>
@@ -57,9 +57,7 @@ export default {
     }
   },
   mounted () {
-    console.log(this.user.loginName)
     if (localStorage.accesstoken) {
-      console.log('用户加载')
       this.getCollected()
     }
     if (this.accesstoken !== '') {
@@ -81,17 +79,18 @@ export default {
             accesstoken: this.accesstoken
           })
         // 成功响应
-        .then(function (respone) {
+        .then(function ({data}) {
           alert('登录成功')
           // 清空原有的收藏主题
           this.collTopicList.length = 0
           // 清除上次的localStorage缓存
           localStorage.clear()
           this.login = true
-          this.user.loginName = respone.data.loginname
-          this.user.imgUrl = respone.data.avatar_url
+          this.user.loginName = data.loginname
+          this.user.imgUrl = data.avatar_url
 
           // 保存到loca1Storge
+          localStorage.loginStatus = true
           localStorage.accesstoken = this.accesstoken
           localStorage.loginName = this.user.loginName
           localStorage.imgUrl = this.user.imgUrl
@@ -104,10 +103,9 @@ export default {
     },
     getCollected () {
       this.$http.get('https://cnodejs.org/api/v1/topic_collect/' + this.user.loginName)
-      .then((result) => {
-        this.user.Topiccal = result.data.data.length
-        console.log(result.data.data.length)
-        this.collTopicList = result.data.data
+      .then(({data}) => {
+        this.user.Topiccal = data.data.length
+        this.collTopicList = data.data
         localStorage.collTopicList = JSON.stringify(this.collTopicList)
       },
       (err) => {
@@ -118,10 +116,10 @@ export default {
     signOut () {
       this.login = false
       this.accesstoken = ''
+      // 清除上次的localStorage缓存
       localStorage.clear()
       setTimeout(() => {
         alert('成功退出')
-        // 清除上次的localStorage缓存
       }, 200)
     }
   }
@@ -173,7 +171,7 @@ export default {
     padding: 0 pxRem(8) 0 pxRem(8);
     /*用户头像*/
     .avatar {
-      margin-top: pxRem(5);
+      margin-top: pxRem(8);
       line-height: pxRem(50);
       img {
         float: left;
@@ -193,7 +191,7 @@ export default {
     }
     //收藏的话题
     .topiccal {
-      margin-top: pxRem(32);
+      margin-top: pxRem(10);
       margin-bottom: pxRem(10);
     }
   }

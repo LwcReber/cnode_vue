@@ -13,8 +13,8 @@
         </div>
         <div class="topicCont">
           <div class="topichead">
-            <span class="tabtype" v-show="tabtypeShow" v-bind:class="{true:'active' ,false:''}">{{topic.top?'置顶' : topic.good? '精华' : topic.tab=='ask' ? '问答' :'分享'}}</span>
-            <span class="topicAtr">{{topic.author.loginname}}</span>
+            <div class="tabtype" v-show="tabtypeShow">{{topic.top?'置顶' : topic.good? '精华' : topic.tab=='ask' ? '问答' :'分享'}}</div>
+            <span class="topicAtr">发表人： {{topic.author.loginname}}</span>
           </div>
           <h4>{{topic.title}}</h4>
         </div>
@@ -22,7 +22,6 @@
       <sync-loader class="loading-bar" :loading="loading" :color="color"></sync-loader>
     </div>
     <v-go-top></v-go-top>
-
   </div>
 </template>
 
@@ -54,7 +53,7 @@ export default {
   methods: {
     changeTab (tab) {
       // 清除其他tab的active
-      for (var i = 0; i < this.headerTab.length; i++) {
+      for (let i = 0; i < this.headerTab.length; i++) {
         if (this.headerTab[i] !== tab) {
           this.headerTab[i].isActive = false
         }
@@ -87,10 +86,9 @@ export default {
         this.loading = false
       },
       // 响应失败
-      (result) => {
+      ({body}) => {
         // 开启滚动加载
         this.busy = true
-        console.log(result)
       }
       )
     },
@@ -131,8 +129,32 @@ export default {
   display: inline-block;
   &.activeNav {
     background-color: #0287D0;
+    animation: bounce 0.5s;
   }
 }
+
+// active的动画效果
+@keyframes bounce {
+  from, 20%, 53%, 80%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transform: translate3d(0,0,0);
+  }
+
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -30px, 0);
+  }
+
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -15px, 0);
+  }
+
+  90% {
+    transform: translate3d(0,-4px,0);
+  }
+}
+
 .container {
   background-color: #ECEFF1;
   padding: pxRem(10) pxRem(8) pxRem(120) pxRem(8);

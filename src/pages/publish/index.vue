@@ -11,6 +11,7 @@
           <option value="share">分享</option>
           <option value="ask">问答</option>
           <option value="job">招聘</option>
+          <option value="dev">客户端</option>
         </select>
         <div class="ask" v-show="getPubType=='ask'">
           提问时，请遵循 《提问的智慧》中提及的要点，以便您更接收到高质量回复。
@@ -43,6 +44,12 @@ export default {
   },
   methods: {
     submit () {
+      console.log('1次')
+      // 如果没有accesstoken提示先登录
+      if (!localStorage.accesstoken) {
+        alert('请先登录')
+        return
+      }
       // 内容为空不发送请求
       if (this.getIpt === '' || this.getPubType === 'none' || this.getMarkdown === '') {
         alert('内容为空')
@@ -50,20 +57,20 @@ export default {
       }
       this.$http.post('https://cnodejs.org/api/v1/topics',
         {
-          accesstoken: '32794b15-c1e8-4d80-8170-fdfb52d65a70',
+          accesstoken: localStorage.accesstoken,
           title: this.getIpt,
           tab: this.getPubType,
           content: this.getMarkdown
         })
-      .then((respone) => {
-        if (respone.success === true) {
+      .then(({body}) => {
+        if (body.success === true) {
           alert('发表成功')
         } else {
           alert('发表失败')
         }
       },
-      (result) => {
-        console.log(result)
+      ({body}) => {
+        alert(body.error_msg)
       }
       )
     }
@@ -85,6 +92,7 @@ export default {
       height: pxRem(30);
       margin-left: pxRem(10);
       border-radius: pxRem(2);
+      font-size: pxRem(16);
     }
 
     .ask , .job {
@@ -100,6 +108,7 @@ export default {
     border: pxRem(1) solid #DCDCDC;
     border-radius: pxRem(5);
     outline: none;
+    font-size: pxRem(16);
   }
   // 提交按钮
   .commit {
