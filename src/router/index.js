@@ -5,7 +5,9 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // 使用history模式重新刷新页面会出现404，因为无法修改后端配置，只能禁用history模式了
+  // mode: 'history',
+  // base: '/cnode_vue/',
   routes: [
     {
       path: '/home', // 主页
@@ -37,7 +39,7 @@ export default new Router({
       component: resolve => require(['../pages/home/'], resolve)
     },
     {
-      path: '*', // 其他页面，强制跳转到登录页面
+      path: '*', // 其他页面，强制跳转到home页
       redirect: '/home'
     }
   ]
