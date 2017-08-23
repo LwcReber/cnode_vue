@@ -1,5 +1,0 @@
-// 重新计算rem
-// 按main.js 的rem基准配置为100px
-@function pxRem($px) {
-  @return $px / 100 * 1rem;
-}
