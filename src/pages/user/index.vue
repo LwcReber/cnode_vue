@@ -10,7 +10,7 @@
           请输入您的accesstoken
         </div>
         <input type="text"  class="reg-Ipt " v-model="accesstoken" placeholder="accesstoken">
-        <div class="reg-button" @click="register">登录</div>
+        <button class="reg-button" @click="register">登录</button>
         <div class="alert-danger acc-warn" v-show='accWarn'>
           请输入accesstoken!!!
         </div>
@@ -152,16 +152,31 @@ export default {
       border: pxRem(1) solid #DCDCDC;
       border-radius: pxRem(5);
     }
+    // 注册按钮
     .reg-button {
+      display: inline-block;
       width: 100%;
-      height: pxRem(30);
-      line-height: pxRem(30);
+      height: pxRem(40);
+      line-height: pxRem(40);
       margin-top: pxRem(8);
       border-radius: pxRem(5);
       text-align: center;
-      background-color: #747474;
+      background-color: #FEFEFE;
+      border: none;
+      outline: none;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: pxRem(20);
+      box-shadow: 0 pxRem(10) pxRem(10) #777;
+    }
+    // 按钮点击时按下效果
+    .reg-button:active {
+      background-color: #BCBCBC;
+      box-shadow: 0 pxRem(2) pxRem(5) #777;
+      transform: translateY(pxRem(5));
     }
     .acc-warn {
+      margin-top: pxRem(15);
       height: pxRem(30);
     }
   }
